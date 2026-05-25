@@ -1,4 +1,5 @@
 const WP_API_BASE = process.env.WP_API_URL || "https://blog.avdesignintl.com/wp-json/wp/v2";
+const WP_IMAGE_BASE = process.env.WP_IMAGE_URL || "https://blog.avdesignintl.com";
 
 /* ── Types ──────────────────────────────────────────── */
 
@@ -84,7 +85,18 @@ export async function getRecentPosts(limit = 3): Promise<WPPost[]> {
 export function extractFeaturedImage(post: WPPost): { url: string; alt: string; width: number; height: number } | null {
   const media = post._embedded?.["wp:featuredmedia"]?.[0];
   if (!media) return null;
-  const url = media.media_details?.sizes?.medium_large?.source_url || media.source_url;
+  let url = media.media_details?.sizes?.medium_large?.source_url || media.source_url;
+  // Ensure image URL uses the correct base (replace if needed)
+  if (url && WP_IMAGE_BASE) {
+    try {
+      const urlObj = new URL(url);
+      const imgBase = new URL(WP_IMAGE_BASE);
+      if (urlObj.hostname !== imgBase.hostname && imgBase.hostname !== "blog.avdesignintl.com") {
+        // Only rewrite if the image base is not the standard blog domain
+        url = url.replace(urlObj.origin, WP_IMAGE_BASE);
+      }
+    } catch {}
+  }
   const width = media.media_details?.sizes?.medium_large?.width || 768;
   const height = media.media_details?.sizes?.medium_large?.height || 512;
   return { url, alt: media.alt_text || post.title.rendered, width, height };
