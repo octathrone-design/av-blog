@@ -1,9 +1,14 @@
-const WP_API_BASE = process.env.WP_API_URL || "https://blog.avdesignintl.com/wp-json/wp/v2";
-const WP_IMAGE_BASE = process.env.WP_IMAGE_URL || "https://blog.avdesignintl.com";
+const WP_API_BASE = process.env.WP_API_URL || "https://wp-api.avdesignintl.com/wp-json/wp/v2";
 
-// Image proxy: /api/image-proxy?path=...
-const PROXY_ENABLED = process.env.IMAGE_PROXY === "true" || false;
-const PROXY_BASE = process.env.IMAGE_PROXY_BASE || "/api/image-proxy";
+// Map of known WordPress media slugs to local image paths
+// These SVG files live in public/images/blog/ and are served directly from Netlify CDN
+const LOCAL_IMAGE_MAP: Record<string, string> = {
+  "featured-image-1779358726": "/images/blog/featured-image-1779358726.svg",
+  "featured-image-1779358658": "/images/blog/featured-image-1779358658.svg",
+  "avd-logo": "/images/blog/avd-logo.svg",
+  "black-color-logo": "/images/blog/black-color-logo.svg",
+  "woocommerce-placeholder": "/images/blog/woocommerce-placeholder.svg",
+};
 
 /* ── Types ──────────────────────────────────────────── */
 
@@ -20,6 +25,7 @@ interface WPPost {
     "wp:featuredmedia"?: Array<{
       source_url: string;
       alt_text: string;
+      slug?: string;
       media_details?: {
         sizes?: Record<string, { source_url: string; width: number; height: number }>;
       };
@@ -86,45 +92,34 @@ export async function getRecentPosts(limit = 3): Promise<WPPost[]> {
 
 /* ── Helpers ────────────────────────────────────────── */
 
-/** Extract the uploads-relative path from a WordPress image URL */
-function getUploadsPath(imageUrl: string): string | null {
-  // Match wp-content/uploads/... path from any WordPress URL
-  const match = imageUrl.match(/\/wp-content\/uploads\/(.+)/);
-  if (!match) {
-    // Handle the case where source_url is relative to wp-api or similar
-    const altMatch = imageUrl.match(/uploads\/(.+)/);
-    return altMatch ? `uploads/${altMatch[1]}` : null;
+/**
+ * Resolve a WordPress media slug to a local image path.
+ * Falls back to the original URL if no local mapping exists.
+ */
+function resolveLocalImage(sourceUrl: string, mediaSlug?: string): string {
+  if (mediaSlug && LOCAL_IMAGE_MAP[mediaSlug]) {
+    return LOCAL_IMAGE_MAP[mediaSlug];
   }
-  return `wp-content/uploads/${match[1]}`;
-}
-
-function proxyImageUrl(url: string): string {
-  if (!PROXY_ENABLED || !url) return url;
-  const uploadsPath = getUploadsPath(url);
-  if (!uploadsPath) return url;
-  return `${PROXY_BASE}?path=${encodeURIComponent(uploadsPath)}`;
+  // Try to extract slug from URL
+  const match = sourceUrl.match(/([^/]+?)(?:-\d+x\d+)?\.\w+$/);
+  if (match) {
+    const baseName = match[1].replace(/-\d+x\d+$/, "");
+    if (LOCAL_IMAGE_MAP[baseName]) {
+      return LOCAL_IMAGE_MAP[baseName];
+    }
+  }
+  return sourceUrl;
 }
 
 export function extractFeaturedImage(post: WPPost): { url: string; alt: string; width: number; height: number } | null {
   const media = post._embedded?.["wp:featuredmedia"]?.[0];
   if (!media) return null;
-  let url = media.media_details?.sizes?.medium_large?.source_url || media.source_url;
-  // Ensure image URL uses the correct base (replace if needed)
-  if (url && WP_IMAGE_BASE) {
-    try {
-      const urlObj = new URL(url);
-      const imgBase = new URL(WP_IMAGE_BASE);
-      if (urlObj.hostname !== imgBase.hostname && imgBase.hostname !== "blog.avdesignintl.com") {
-        // Only rewrite if the image base is not the standard blog domain
-        url = url.replace(urlObj.origin, WP_IMAGE_BASE);
-      }
-    } catch {}
-  }
-  // Proxy through our API route
-  url = proxyImageUrl(url);
+  
+  const url = resolveLocalImage(media.source_url, media.slug || media.source_url.match(/([^/]+?)(?:-\d+x\d+)?\.\w+$/)?.[1]);
+  const alt = media.alt_text || post.title.rendered;
   const width = media.media_details?.sizes?.medium_large?.width || 768;
   const height = media.media_details?.sizes?.medium_large?.height || 512;
-  return { url, alt: media.alt_text || post.title.rendered, width, height };
+  return { url, alt, width, height };
 }
 
 export function extractCategories(post: WPPost): Array<{ id: number; name: string; slug: string }> {
@@ -141,16 +136,26 @@ export function stripHtml(html: string): string {
 }
 
 /**
- * Rewrites inline images in post content so they go through the image proxy.
+ * Rewrites inline images in post content so they use local SVG assets instead of
+ * broken WordPress upload URLs.
  */
 export function rewriteContentImages(html: string): string {
-  if (!PROXY_ENABLED || !html) return html;
-  // Replace img src attributes pointing to blog.avdesignintl.com/wp-content/uploads/
+  if (!html) return html;
+  // Map inline WordPress image URLs to local SVGs
   return html.replace(
-    /(<img[^>]*src=")(https?:\/\/[^"']*\/wp-content\/uploads\/([^"]+))("[^>]*>)/g,
-    (match, before, _url, uploadPath, after) => {
-      const proxyUrl = `/api/image-proxy?path=${encodeURIComponent(`wp-content/uploads/${uploadPath}`)}`;
-      return `${before}${proxyUrl}${after}`;
+    /<img[^>]+src="https?:\/\/[^"']*\/wp-content\/uploads\/([^"]+)"([^>]*)>/g,
+    (_match, uploadPath, rest) => {
+      // Extract the filename without size suffix (e.g. featured-image-1779358726-300x224 -> featured-image-1779358726)
+      const baseMatch = uploadPath.match(/([^/]+?)(?:-\d+x\d+)?\.\w+$/);
+      if (baseMatch) {
+        const baseName = baseMatch[1];
+        const localPath = LOCAL_IMAGE_MAP[baseName];
+        if (localPath) {
+          return `<img src="${localPath}"${rest}>`;
+        }
+      }
+      // If no local match, use a placeholder
+      return `<img src="/images/blog/featured-image-1779358726.svg" alt="Image" loading="lazy">`;
     }
   );
-}  
+}

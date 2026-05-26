@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="446" height="612" viewBox="0 0 446 612">
+  <defs>
+    <linearGradient id="blkBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#111111"/>
+      <stop offset="100%" style="stop-color:#050505"/>
+    </linearGradient>
+    <linearGradient id="blkGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#C48A4D"/>
+      <stop offset="50%" style="stop-color:#e8b87e"/>
+      <stop offset="100%" style="stop-color:#a67c52"/>
+    </linearGradient>
+  </defs>
+  <rect width="446" height="612" fill="url(#blkBg)"/>
+  <!-- A V logo mark -->
+  <g transform="translate(223, 260)">
+    <line x1="0" y1="-80" x2="-60" y2="40" stroke="url(#blkGold)" stroke-width="3" opacity="0.7"/>
+    <line x1="0" y1="-80" x2="60" y2="40" stroke="url(#blkGold)" stroke-width="3" opacity="0.7"/>
+    <line x1="-35" y1="-20" x2="35" y2="-20" stroke="url(#blkGold)" stroke-width="2" opacity="0.5"/>
+    <line x1="-60" y1="40" x2="-80" y2="50" stroke="url(#blkGold)" stroke-width="1.5" opacity="0.3"/>
+    <line x1="60" y1="40" x2="80" y2="50" stroke="url(#blkGold)" stroke-width="1.5" opacity="0.3"/>
+  </g>
+  <!-- Text -->
+  <text x="223" y="430" text-anchor="middle" font-family="Georgia, serif" font-size="32" fill="url(#blkGold)" letter-spacing="8">AV</text>
+  <text x="223" y="470" text-anchor="middle" font-family="Georgia, serif" font-size="9" fill="#C48A4D" letter-spacing="10" opacity="0.5">DESIGN</text>
+  <line x1="140" y1="495" x2="306" y2="495" stroke="url(#blkGold)" stroke-width="0.5" opacity="0.3"/>
+  <text x="223" y="530" text-anchor="middle" font-family="Georgia, serif" font-size="8" fill="#C48A4D" letter-spacing="8" opacity="0.35">INTERNATIONAL</text>
+</svg>

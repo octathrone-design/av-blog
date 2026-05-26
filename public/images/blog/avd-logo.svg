@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="916" height="1244" viewBox="0 0 916 1244">
+  <defs>
+    <linearGradient id="logoBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0a0a"/>
+      <stop offset="100%" style="stop-color:#1a1a1a"/>
+    </linearGradient>
+    <linearGradient id="logoGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#C48A4D"/>
+      <stop offset="50%" style="stop-color:#e8b87e"/>
+      <stop offset="100%" style="stop-color:#a67c52"/>
+    </linearGradient>
+  </defs>
+  <rect width="916" height="1244" fill="url(#logoBg)"/>
+  <!-- Decorative lines top -->
+  <line x1="458" y1="100" x2="458" y2="200" stroke="url(#logoGold)" stroke-width="1" opacity="0.3"/>
+  <line x1="300" y1="120" x2="616" y2="120" stroke="url(#logoGold)" stroke-width="0.5" opacity="0.15"/>
+  <!-- Main logo text -->
+  <text x="458" y="420" text-anchor="middle" font-family="Georgia, serif" font-size="80" fill="url(#logoGold)" letter-spacing="12">AV</text>
+  <text x="458" y="500" text-anchor="middle" font-family="Georgia, serif" font-size="20" fill="#C48A4D" letter-spacing="15" opacity="0.6">DESIGN</text>
+  <!-- Divider -->
+  <line x1="300" y1="550" x2="616" y2="550" stroke="url(#logoGold)" stroke-width="1" opacity="0.3"/>
+  <line x1="358" y1="555" x2="558" y2="555" stroke="url(#logoGold)" stroke-width="0.5" opacity="0.15"/>
+  <!-- Subtitle -->
+  <text x="458" y="620" text-anchor="middle" font-family="Georgia, serif" font-size="11" fill="#C48A4D" letter-spacing="6" opacity="0.5">SUBSCRIBE</text>
+  <text x="458" y="660" text-anchor="middle" font-family="Georgia, serif" font-size="10" fill="#C48A4D" letter-spacing="7" opacity="0.4">DESIGN</text>
+  <text x="458" y="700" text-anchor="middle" font-family="Georgia, serif" font-size="10" fill="#C48A4D" letter-spacing="8" opacity="0.4">PORTFOLIO</text>
+  <!-- Diamond -->
+  <polygon points="458,280 508,355 458,430 408,355" fill="none" stroke="url(#logoGold)" stroke-width="1.5" opacity="0.4"/>
+  <polygon points="458,295 495,355 458,415 421,355" fill="none" stroke="url(#logoGold)" stroke-width="0.5" opacity="0.2"/>
+  <!-- Bottom decorative -->
+  <line x1="300" y1="780" x2="616" y2="780" stroke="url(#logoGold)" stroke-width="0.5" opacity="0.15"/>
+  <text x="458" y="830" text-anchor="middle" font-family="Georgia, serif" font-size="9" fill="#C48A4D" letter-spacing="11" opacity="0.3">INTERNATIONAL</text>
+  <!-- Vertical lines -->
+  <line x1="200" y1="100" x2="200" y2="900" stroke="#C48A4D" stroke-width="0.3" opacity="0.08"/>
+  <line x1="716" y1="100" x2="716" y2="900" stroke="#C48A4D" stroke-width="0.3" opacity="0.08"/>
+  <!-- Bottom mark -->
+  <line x1="358" y1="950" x2="558" y2="950" stroke="#C48A4D" stroke-width="0.5" opacity="0.2"/>
+</svg>

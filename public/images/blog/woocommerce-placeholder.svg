@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200">
+  <rect width="1200" height="1200" fill="#f0eee9"/>
+  <g opacity="0.3">
+    <circle cx="600" cy="600" r="200" fill="none" stroke="#C48A4D" stroke-width="2"/>
+    <circle cx="600" cy="600" r="150" fill="none" stroke="#C48A4D" stroke-width="1"/>
+    <circle cx="600" cy="600" r="100" fill="none" stroke="#C48A4D" stroke-width="1"/>
+    <line x1="400" y1="600" x2="800" y2="600" stroke="#C48A4D" stroke-width="1"/>
+    <line x1="600" y1="400" x2="600" y2="800" stroke="#C48A4D" stroke-width="1"/>
+  </g>
+  <text x="600" y="860" text-anchor="middle" font-family="Georgia, serif" font-size="18" fill="#C48A4D" opacity="0.4" letter-spacing="6">PRODUCT IMAGE</text>
+</svg>
