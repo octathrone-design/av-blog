@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { format } from "date-fns";
-import { getPosts, getCategories, extractFeaturedImage, extractCategories, stripHtml } from "@/lib/wp";
+import { getPosts, getCategories, extractFeaturedImage, extractCategories, getExcerpt, stripHtml } from "@/lib/wp";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -94,7 +94,7 @@ export default async function BlogHome({
                     {post.title.rendered}
                   </h2>
                   <p className="text-sm text-foreground/60 font-light leading-relaxed line-clamp-2 mb-4">
-                    {stripHtml(post.excerpt.rendered)}
+                    {stripHtml(getExcerpt(post))}
                   </p>
                   <p className="text-xs text-foreground/40 font-light">{format(date, "MMMM dd, yyyy")}</p>
                 </Link>

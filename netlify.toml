@@ -1,0 +1,15 @@
+[build]
+  publish = ".next"
+  command = "next build"
+
+[[redirects]]
+  from = "/wp-api/*"
+  to = "https://blog.avdesignintl.com/wp-json/:splat"
+  status = 200
+  force = true
+
+# Fallback for SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

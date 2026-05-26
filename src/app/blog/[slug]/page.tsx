@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import Link from "next/link";
-import { getPost, getRecentPosts, extractFeaturedImage, extractCategories, getPosts } from "@/lib/wp";
+import { getPost, getRecentPosts, extractFeaturedImage, extractCategories, getPosts, getExcerpt } from "@/lib/wp";
 import { Metadata } from "next";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -19,20 +19,26 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  const post = await getPost(slug);
-  if (!post) return { title: "Post Not Found" };
+  try {
+    const { slug } = await params;
+    const post = await getPost(slug);
+    if (!post) return { title: "Post Not Found | AV Design International" };
 
-  return {
-    title: `${post.title.rendered} | AV Design International`,
-    description: post.excerpt.rendered.replace(/<[^>]*>/g, "").slice(0, 160),
-    openGraph: {
-      title: post.title.rendered,
-      description: post.excerpt.rendered.replace(/<[^>]*>/g, "").slice(0, 160),
-      type: "article",
-      publishedTime: post.date,
-    },
-  };
+    const desc = stripHtml(getExcerpt(post)).slice(0, 160);
+
+    return {
+      title: `${post.title.rendered} | AV Design International`,
+      description: desc,
+      openGraph: {
+        title: post.title.rendered,
+        description: desc,
+        type: "article",
+        publishedTime: post.date,
+      },
+    };
+  } catch {
+    return { title: "Blog | AV Design International" };
+  }
 }
 
 export default async function BlogPost({ params }: Props) {

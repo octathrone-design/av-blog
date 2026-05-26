@@ -7,7 +7,7 @@ interface WPPost {
   id: number;
   slug: string;
   title: { rendered: string };
-  excerpt: { rendered: string };
+  excerpt: { rendered: string } | string;
   content: { rendered: string };
   date: string;
   modified: string;
@@ -104,6 +104,11 @@ export function extractFeaturedImage(post: WPPost): { url: string; alt: string; 
 
 export function extractCategories(post: WPPost): Array<{ id: number; name: string; slug: string }> {
   return post._embedded?.["wp:term"]?.[0] || [];
+}
+
+export function getExcerpt(post: WPPost): string {
+  if (typeof post.excerpt === "string") return post.excerpt;
+  return post.excerpt?.rendered || "";
 }
 
 export function stripHtml(html: string): string {
