@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import Link from "next/link";
-import { getPost, getRecentPosts, extractFeaturedImage, extractCategories, getPosts, getExcerpt } from "@/lib/wp";
+import { getPost, getRecentPosts, extractFeaturedImage, extractCategories, getPosts, getExcerpt, stripHtml } from "@/lib/wp";
 import { Metadata } from "next";
 
 type Props = { params: Promise<{ slug: string }> };
