@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const desc = stripHtml(getExcerpt(post)).slice(0, 160);
 
     return {
-      title: `${post.title.rendered} | AV Design International`,
+      title: post.title.rendered,
       description: desc,
       openGraph: {
         title: post.title.rendered,
