@@ -1,6 +1,10 @@
 const WP_API_BASE = process.env.WP_API_URL || "https://blog.avdesignintl.com/wp-json/wp/v2";
 const WP_IMAGE_BASE = process.env.WP_IMAGE_URL || "https://blog.avdesignintl.com";
 
+// Image proxy: /api/image-proxy?path=...
+const PROXY_ENABLED = process.env.IMAGE_PROXY === "true" || false;
+const PROXY_BASE = process.env.IMAGE_PROXY_BASE || "/api/image-proxy";
+
 /* ── Types ──────────────────────────────────────────── */
 
 interface WPPost {
@@ -82,6 +86,25 @@ export async function getRecentPosts(limit = 3): Promise<WPPost[]> {
 
 /* ── Helpers ────────────────────────────────────────── */
 
+/** Extract the uploads-relative path from a WordPress image URL */
+function getUploadsPath(imageUrl: string): string | null {
+  // Match wp-content/uploads/... path from any WordPress URL
+  const match = imageUrl.match(/\/wp-content\/uploads\/(.+)/);
+  if (!match) {
+    // Handle the case where source_url is relative to wp-api or similar
+    const altMatch = imageUrl.match(/uploads\/(.+)/);
+    return altMatch ? `uploads/${altMatch[1]}` : null;
+  }
+  return `wp-content/uploads/${match[1]}`;
+}
+
+function proxyImageUrl(url: string): string {
+  if (!PROXY_ENABLED || !url) return url;
+  const uploadsPath = getUploadsPath(url);
+  if (!uploadsPath) return url;
+  return `${PROXY_BASE}?path=${encodeURIComponent(uploadsPath)}`;
+}
+
 export function extractFeaturedImage(post: WPPost): { url: string; alt: string; width: number; height: number } | null {
   const media = post._embedded?.["wp:featuredmedia"]?.[0];
   if (!media) return null;
@@ -97,6 +120,8 @@ export function extractFeaturedImage(post: WPPost): { url: string; alt: string; 
       }
     } catch {}
   }
+  // Proxy through our API route
+  url = proxyImageUrl(url);
   const width = media.media_details?.sizes?.medium_large?.width || 768;
   const height = media.media_details?.sizes?.medium_large?.height || 512;
   return { url, alt: media.alt_text || post.title.rendered, width, height };
@@ -114,3 +139,18 @@ export function getExcerpt(post: WPPost): string {
 export function stripHtml(html: string): string {
   return html.replace(/<[^>]*>/g, "");
 }
+
+/**
+ * Rewrites inline images in post content so they go through the image proxy.
+ */
+export function rewriteContentImages(html: string): string {
+  if (!PROXY_ENABLED || !html) return html;
+  // Replace img src attributes pointing to blog.avdesignintl.com/wp-content/uploads/
+  return html.replace(
+    /(<img[^>]*src=")(https?:\/\/[^"']*\/wp-content\/uploads\/([^"]+))("[^>]*>)/g,
+    (match, before, _url, uploadPath, after) => {
+      const proxyUrl = `/api/image-proxy?path=${encodeURIComponent(`wp-content/uploads/${uploadPath}`)}`;
+      return `${before}${proxyUrl}${after}`;
+    }
+  );
+}  

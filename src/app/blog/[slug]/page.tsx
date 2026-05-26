@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
 import Link from "next/link";
-import { getPost, getRecentPosts, extractFeaturedImage, extractCategories, getPosts, getExcerpt, stripHtml } from "@/lib/wp";
+import { getPost, getRecentPosts, extractFeaturedImage, extractCategories, getPosts, getExcerpt, stripHtml, rewriteContentImages } from "@/lib/wp";
 import { Metadata } from "next";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -96,7 +96,7 @@ export default async function BlogPost({ params }: Props) {
 
       <article className="px-6 lg:px-12 max-w-content mx-auto pb-24">
         <div className="max-w-3xl mx-auto">
-          <div className="content" dangerouslySetInnerHTML={{ __html: post.content.rendered }} />
+          <div className="content" dangerouslySetInnerHTML={{ __html: rewriteContentImages(post.content.rendered) }} />
 
           <div className="mt-16 pt-8 border-t border-border">
             <p className="text-xs tracking-[0.2em] uppercase text-foreground/40 font-body font-light mb-4">Share this article</p>
